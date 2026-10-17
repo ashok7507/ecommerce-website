@@ -1,509 +1,361 @@
-// ShopNova - E-commerce Website
 
-const products = [
-  {
-    id: 1,
-    name: "Pebble Ceramic Vase",
-    category: "Home",
-    price: 899,
-    oldPrice: 1199,
-    badge: "BESTSELLER",
-    image: "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?auto=format&fit=crop&w=700&q=85"
-  },
-  {
-    id: 2,
-    name: "Studio Wireless Headphones",
-    category: "Tech",
-    price: 2499,
-    oldPrice: null,
-    badge: "POPULAR",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=85"
-  },
-  {
-    id: 3,
-    name: "Everyday Canvas Tote",
-    category: "Accessories",
-    price: 649,
-    oldPrice: null,
-    badge: null,
-    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=700&q=85"
-  },
-  {
-    id: 4,
-    name: "Soft Glow Table Lamp",
-    category: "Home",
-    price: 1899,
-    oldPrice: 2299,
-    badge: "SALE",
-    image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=700&q=85"
-  },
-  {
-    id: 5,
-    name: "Pocket Bluetooth Speaker",
-    category: "Tech",
-    price: 1599,
-    oldPrice: null,
-    badge: "NEW",
-    image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=700&q=85"
-  },
-  {
-    id: 6,
-    name: "Sunday Stoneware Mug",
-    category: "Home",
-    price: 499,
-    oldPrice: null,
-    badge: null,
-    image: "https://images.unsplash.com/photo-1514228742587-6b1558f4b5c4?auto=format&fit=crop&w=700&q=85"
-  },
-  {
-    id: 7,
-    name: "Daily Carry Watch",
-    category: "Accessories",
-    price: 2199,
-    oldPrice: 2799,
-    badge: "FAVOURITE",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=85"
-  },
-  {
-    id: 8,
-    name: "Arc Wireless Earbuds",
-    category: "Tech",
-    price: 1299,
-    oldPrice: null,
-    badge: null,
-    image: "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=700&q=85"
-  }
-];
-
-// DOM shortcuts
 const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => [...document.querySelectorAll(selector)];
 
-// Application state
-let activeCategory = "All";
-let searchTerm = "";
-let sortBy = "featured";
+const toast = $("#toast");
 let toastTimer;
-
-// Format prices in Indian rupees
-function money(amount) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0
-  }).format(amount);
-}
-
-// Load cart from localStorage
-function loadCart() {
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem("shopnova-cart") || "[]"
-    );
-
-    if (!Array.isArray(saved)) return [];
-
-    return saved.filter(item =>
-      products.some(product => product.id === item.id) &&
-      Number.isInteger(item.qty) &&
-      item.qty > 0
-    );
-  } catch {
-    return [];
-  }
-}
-
-let cart = loadCart();
-
-// Save cart
-function saveCart() {
-  try {
-    localStorage.setItem(
-      "shopnova-cart",
-      JSON.stringify(cart)
-    );
-  } catch {
-    // Cart remains available until the page is refreshed.
-  }
-}
-
-// Filter and sort products
-function getVisibleProducts() {
-  let result = products.filter(product => {
-    const matchesCategory =
-      activeCategory === "All" ||
-      product.category === activeCategory;
-
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm) ||
-      product.category.toLowerCase().includes(searchTerm);
-
-    return matchesCategory && matchesSearch;
-  });
-
-  if (sortBy === "low") {
-    result.sort((a, b) => a.price - b.price);
-  }
-
-  if (sortBy === "high") {
-    result.sort((a, b) => b.price - a.price);
-  }
-
-  if (sortBy === "name") {
-    result.sort((a, b) => a.name.localeCompare(b.name));
-  }
-
-  return result;
-}
-
-// Display products
-function renderProducts() {
-  const list = getVisibleProducts();
-  const grid = $("#product-grid");
-
-  grid.innerHTML = list.map(product => `
-    <article class="product-card">
-      <div class="product-image-wrap">
-        <img
-          class="product-image"
-          src="${product.image}"
-          alt="${product.name}"
-          loading="lazy"
-        >
-
-        ${
-          product.badge
-            ? `<span class="product-badge">${product.badge}</span>`
-            : ""
-        }
-
-        <button
-          class="quick-add"
-          data-add="${product.id}"
-          aria-label="Add ${product.name} to bag"
-        >
-          + Add to bag
-        </button>
-      </div>
-
-      <div class="product-info">
-        <div>
-          <h3 class="product-name">${product.name}</h3>
-          <span class="product-category">
-            ${product.category}
-          </span>
-        </div>
-
-        <div class="product-price">
-          ${
-            product.oldPrice
-              ? `<span class="old-price">${money(product.oldPrice)}</span>`
-              : ""
-          }
-          ${money(product.price)}
-        </div>
-      </div>
-    </article>
-  `).join("");
-
-  $("#empty-state").hidden = list.length !== 0;
-  grid.hidden = list.length === 0;
-}
-
-// Change active category
-function setCategory(category) {
-  activeCategory = category;
-
-  document.querySelectorAll(".category").forEach(button => {
-    button.classList.toggle(
-      "active",
-      button.dataset.category === category
-    );
-  });
-
-  renderProducts();
-}
-
-// Calculate cart quantity
-function getCartCount() {
-  return cart.reduce((total, item) => total + item.qty, 0);
-}
-
-// Calculate subtotal
-function getSubtotal() {
-  return cart.reduce((total, item) => {
-    const product = products.find(p => p.id === item.id);
-
-    return total + product.price * item.qty;
-  }, 0);
-}
-
-// Add product to cart
-function addToCart(id) {
-  const existing = cart.find(item => item.id === id);
-
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({ id, qty: 1 });
-  }
-
-  saveCart();
-  renderCart();
-
-  const product = products.find(p => p.id === id);
-
-  showToast(`${product.name} added to your bag!`);
-}
-
-// Update product quantity
-function changeQuantity(id, change) {
-  const item = cart.find(item => item.id === id);
-
-  if (!item) return;
-
-  item.qty += change;
-
-  if (item.qty <= 0) {
-    cart = cart.filter(item => item.id !== id);
-  }
-
-  saveCart();
-  renderCart();
-}
-
-// Remove product from cart
-function removeFromCart(id) {
-  cart = cart.filter(item => item.id !== id);
-
-  saveCart();
-  renderCart();
-}
-
-// Display cart
-function renderCart() {
-  const count = getCartCount();
-
-  $("#cart-count").textContent = count;
-  $("#drawer-count").textContent = count;
-  $("#cart-subtotal").textContent = money(getSubtotal());
-
-  const cartItems = $("#cart-items");
-  const checkout = $("#checkout-button");
-
-  if (cart.length === 0) {
-    cartItems.innerHTML = `
-      <div class="cart-empty">
-        <h3>Your bag is empty.</h3>
-        <p>Find something lovely to bring home.</p>
-        <button class="button outline-button" id="empty-shop">
-          Explore collection
-        </button>
-      </div>
-    `;
-
-    checkout.disabled = true;
-    checkout.style.opacity = "0.5";
-    return;
-  }
-
-  checkout.disabled = false;
-  checkout.style.opacity = "1";
-
-  cartItems.innerHTML = cart.map(item => {
-    const product = products.find(p => p.id === item.id);
-
-    return `
-      <article class="cart-row">
-        <img src="${product.image}" alt="${product.name}">
-
-        <div>
-          <h3>${product.name}</h3>
-
-          <span class="cart-category">
-            ${product.category}
-          </span>
-
-          <div class="qty-control">
-            <button
-              data-qty="${product.id}"
-              data-change="-1"
-              aria-label="Decrease quantity"
-            >−</button>
-
-            <span>${item.qty}</span>
-
-            <button
-              data-qty="${product.id}"
-              data-change="1"
-              aria-label="Increase quantity"
-            >+</button>
-          </div>
-
-          <button
-            class="remove-item"
-            data-remove="${product.id}"
-          >
-            Remove
-          </button>
-        </div>
-
-        <span class="cart-line-price">
-          ${money(product.price * item.qty)}
-        </span>
-      </article>
-    `;
-  }).join("");
-}
-
-// Open shopping cart
-function openCart() {
-  $("#cart-drawer").classList.add("open");
-  $("#overlay").classList.add("visible");
-  document.body.classList.add("no-scroll");
-  $("#close-cart").focus();
-}
-
-// Close shopping cart
-function closeCart() {
-  $("#cart-drawer").classList.remove("open");
-  $("#overlay").classList.remove("visible");
-  document.body.classList.remove("no-scroll");
-}
-
-// Notification message
 function showToast(message) {
-  const toast = $("#toast");
-
   toast.textContent = message;
   toast.classList.add("show");
-
   clearTimeout(toastTimer);
-
-  toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2300);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
 }
 
-// Category buttons
-$("#categories").addEventListener("click", event => {
-  const button = event.target.closest("[data-category]");
+// Mobile sidebar
+$("#menuBtn").addEventListener("click", () => {
+  $("#sidebar").classList.toggle("open");
+});
 
-  if (button) {
-    setCategory(button.dataset.category);
+$$(".nav-link").forEach(link => {
+  link.addEventListener("click", () => {
+    $$(".nav-link").forEach(item => item.classList.remove("active"));
+    link.classList.add("active");
+    $("#pageName").textContent = link.dataset.page;
+    $("#sidebar").classList.remove("open");
+
+    if (link.dataset.page === "AI Assistant") {
+      $("#chatInput").focus();
+    } else if (link.dataset.page === "Projects") {
+      $("#projects").scrollIntoView({ behavior: "smooth", block: "center" });
+    } else if (link.dataset.page === "Analytics") {
+      $("#analytics").scrollIntoView({ behavior: "smooth", block: "center" });
+    } else if (link.dataset.page === "Dashboard") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      showToast(link.dataset.page + " section selected. Demo interface.");
+    }
+  });
+});
+
+// Light/dark mode
+$("#themeBtn").addEventListener("click", () => {
+  document.body.classList.toggle("light");
+  const isLight = document.body.classList.contains("light");
+  $("#themeBtn").textContent = isLight ? "☾" : "☼";
+
+  if (window.usageChart) {
+    window.usageChart.options.scales.x.ticks.color =
+      isLight ? "#68758e" : "#8e9bb5";
+    window.usageChart.options.scales.y.ticks.color =
+      isLight ? "#68758e" : "#8e9bb5";
+    window.usageChart.options.scales.x.grid.color =
+      isLight ? "#e6eaf2" : "#202d43";
+    window.usageChart.options.scales.y.grid.color =
+      isLight ? "#e6eaf2" : "#202d43";
+    window.usageChart.update();
   }
 });
 
-// Product add-to-cart buttons
-$("#product-grid").addEventListener("click", event => {
-  const button = event.target.closest("[data-add]");
+// Search projects
+$("#searchInput").addEventListener("input", event => {
+  const query = event.target.value.trim().toLowerCase();
+  let visible = 0;
 
-  if (button) {
-    addToCart(Number(button.dataset.add));
+  $$(".project-row").forEach(row => {
+    const matches = row.textContent.toLowerCase().includes(query) ||
+      (row.dataset.search || "").includes(query);
+    row.hidden = !matches;
+    if (matches) visible++;
+  });
+
+  if (query && visible === 0) {
+    showToast("No matching projects found.");
   }
 });
 
-// Search
-$("#search-input").addEventListener("input", event => {
-  searchTerm = event.target.value.trim().toLowerCase();
-  renderProducts();
+// Analytics chart
+const chartCanvas = $("#usageChart");
+
+if (window.Chart && chartCanvas) {
+  const chartContext = chartCanvas.getContext("2d");
+  const gradient = chartContext.createLinearGradient(0, 0, 0, 260);
+  gradient.addColorStop(0, "rgba(142, 103, 255, 0.35)");
+  gradient.addColorStop(1, "rgba(142, 103, 255, 0.01)");
+
+  const chartLabels = {
+    7: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    14: ["Day 1", "Day 3", "Day 5", "Day 7", "Day 9", "Day 11", "Day 14"],
+    30: ["Week 1", "Week 2", "Week 3", "Week 4", "Today"]
+  };
+
+  const chartValues = {
+    7: [320, 260, 390, 510, 570, 760, 980],
+    14: [240, 360, 310, 500, 460, 720, 880],
+    30: [380, 520, 460, 790, 980]
+  };
+
+  window.usageChart = new Chart(chartCanvas, {
+    type: "line",
+    data: {
+      labels: chartLabels[7],
+      datasets: [{
+        label: "AI Requests",
+        data: chartValues[7],
+        fill: true,
+        backgroundColor: gradient,
+        borderColor: "#9471ff",
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        pointBackgroundColor: "#c4adff"
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { intersect: false, mode: "index" },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#192640",
+          titleColor: "#fff",
+          bodyColor: "#c9d5eb",
+          padding: 12,
+          displayColors: false
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: "#202d43" },
+          border: { display: false },
+          ticks: { color: "#8e9bb5", font: { size: 10 } }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: "#202d43" },
+          border: { display: false },
+          ticks: { color: "#8e9bb5", maxTicksLimit: 5, font: { size: 10 } }
+        }
+      }
+    }
+  });
+
+  $("#chartRange").addEventListener("change", event => {
+    const range = event.target.value;
+    window.usageChart.data.labels = chartLabels[range];
+    window.usageChart.data.datasets[0].data = chartValues[range];
+    window.usageChart.update();
+  });
+} else {
+  chartCanvas.parentElement.innerHTML =
+    '<p class="muted">Chart unavailable. Check your internet connection to load Chart.js.</p>';
+}
+
+// Create projects
+const projectDialog = $("#projectDialog");
+
+$("#newProjectBtn").addEventListener("click", () => {
+  $("#projectForm").reset();
+  projectDialog.showModal();
+  $("#projectName").focus();
 });
 
-// Sorting
-$("#sort-select").addEventListener("change", event => {
-  sortBy = event.target.value;
-  renderProducts();
-});
-
-// Clear filters
-$("#clear-filters").addEventListener("click", () => {
-  searchTerm = "";
-  $("#search-input").value = "";
-
-  setCategory("All");
-});
-
-// Focus search
-$("#search-focus").addEventListener("click", () => {
-  $("#products").scrollIntoView({ behavior: "smooth" });
-
-  setTimeout(() => $("#search-input").focus(), 300);
-});
-
-// Cart controls
-$("#open-cart").addEventListener("click", openCart);
-$("#close-cart").addEventListener("click", closeCart);
-$("#overlay").addEventListener("click", closeCart);
-$("#continue-shopping").addEventListener("click", closeCart);
-
-// Handle cart quantity changes and remove buttons
-$("#cart-items").addEventListener("click", event => {
-  const quantityButton = event.target.closest("[data-qty]");
-  const removeButton = event.target.closest("[data-remove]");
-
-  if (quantityButton) {
-    changeQuantity(
-      Number(quantityButton.dataset.qty),
-      Number(quantityButton.dataset.change)
-    );
-  }
-
-  if (removeButton) {
-    removeFromCart(Number(removeButton.dataset.remove));
-  }
-
-  if (event.target.closest("#empty-shop")) {
-    closeCart();
-
-    $("#products").scrollIntoView({
-      behavior: "smooth"
-    });
-  }
-});
-
-// Close cart with Escape
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    closeCart();
-  }
-});
-
-// Mobile navigation
-$("#menu-toggle").addEventListener("click", () => {
-  $("#nav").classList.toggle("nav-open");
-});
-
-$("#nav").addEventListener("click", event => {
-  if (event.target.closest("a")) {
-    $("#nav").classList.remove("nav-open");
-  }
-});
-
-// Demo checkout
-$("#checkout-button").addEventListener("click", () => {
-  if (cart.length === 0) return;
-
-  showToast(
-    "Demo checkout only. Connect a payment gateway to accept payments."
-  );
-});
-
-// Demo newsletter form
-$("#newsletter-form").addEventListener("submit", event => {
+$("#projectForm").addEventListener("submit", event => {
   event.preventDefault();
 
-  const email = $("#email-input").value.trim();
+  const name = $("#projectName").value.trim();
+  const description = $("#projectDescription").value.trim();
 
-  if (!email) return;
+  if (!name) return;
 
-  $("#newsletter-message").textContent =
-    "Thanks for subscribing! This is a demo form.";
+  const row = document.createElement("article");
+  row.className = "project-row";
+  row.dataset.search = (name + " " + description).toLowerCase();
 
-  event.target.reset();
+  const icon = document.createElement("span");
+  icon.className = "project-icon purple";
+  icon.textContent = "✧";
+
+  const info = document.createElement("div");
+  info.className = "project-info";
+
+  const title = document.createElement("strong");
+  title.textContent = name;
+
+  const detail = document.createElement("small");
+  detail.textContent = description || "New AI project";
+
+  info.append(title, detail);
+
+  const status = document.createElement("span");
+  status.className = "status active-status";
+  status.textContent = "Active";
+
+  const time = document.createElement("small");
+  time.className = "project-time";
+  time.textContent = "Just now";
+
+  row.append(icon, info, status, time);
+  $("#projectList").prepend(row);
+
+  const current = Number($("#projectsStat").textContent);
+  $("#projectsStat").textContent = current + 1;
+
+  projectDialog.close();
+  showToast("Project created in this demo!");
 });
 
-// Footer year
-$("#year").textContent = new Date().getFullYear();
+// Filter and view all projects
+$("#viewAllBtn").addEventListener("click", () => {
+  $("#searchInput").value = "";
+  $$(".project-row").forEach(row => row.hidden = false);
+  $("#projects").scrollIntoView({ behavior: "smooth", block: "center" });
+  showToast("Showing all projects.");
+});
 
-// Initial render
-renderProducts();
-renderCart();
+$("#allToolsBtn").addEventListener("click", () => {
+  showToast("Explore AI Chat, AI Writer, Image Studio and Data Analyst.");
+});
+
+$("#upgradeBtn").addEventListener("click", () => {
+  showToast("Pro plan preview — connect a billing service to enable upgrades.");
+});
+
+$("#notificationBtn").addEventListener("click", () => {
+  showToast("You're all caught up!");
+});
+
+// Project menu buttons
+$("#projectList").addEventListener("click", event => {
+  const button = event.target.closest(".more-btn");
+  if (!button) return;
+
+  const row = button.closest(".project-row");
+  const name = row.querySelector(".project-info strong").textContent;
+
+  if (confirm(`Delete "${name}" from this demo dashboard?`)) {
+    row.remove();
+    $("#projectsStat").textContent =
+      Math.max(0, Number($("#projectsStat").textContent) - 1);
+    showToast("Project removed.");
+  }
+});
+
+// Chat UI: this is a front-end demo, not a connected AI service.
+function addMessage(text, sender) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "message " +
+    (sender === "user" ? "user-message" : "assistant-message");
+
+  if (sender !== "user") {
+    const avatar = document.createElement("span");
+    avatar.className = "chat-avatar";
+    avatar.textContent = "✧";
+    wrapper.appendChild(avatar);
+  }
+
+  const bubble = document.createElement("div");
+  const paragraph = document.createElement("p");
+  paragraph.textContent = text;
+  bubble.appendChild(paragraph);
+  wrapper.appendChild(bubble);
+
+  const chat = $("#chatMessages");
+  chat.appendChild(wrapper);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function demoReply(prompt) {
+  const text = prompt.toLowerCase();
+
+  if (text.includes("idea") || text.includes("startup")) {
+    return "Here are three ideas to explore:\n1. An AI study planner that personalizes daily learning.\n2. A small-business content assistant.\n3. A dashboard that turns reports into simple insights.\n\nWhich one would you like to develop?";
+  }
+
+  if (text.includes("write") || text.includes("content") ||
+      text.includes("blog") || text.includes("description")) {
+    return "Let's create something great! Start with a clear headline, explain the main benefit, and finish with one simple call to action. Tell me your topic and target audience to build a more specific draft.";
+  }
+
+  if (text.includes("data") || text.includes("analy")) {
+    return "I can help you plan an analysis. Start with your dataset, decide which question you want to answer, check for missing values, and compare the important metrics. This demo cannot inspect files or run real data analysis yet.";
+  }
+
+  if (text.includes("week") || text.includes("plan") ||
+      text.includes("productivity")) {
+    return "Try this simple plan:\n• Monday: choose your top three goals.\n• Tuesday–Wednesday: focus on your main project.\n• Thursday: review progress and resolve blockers.\n• Friday: summarize results and plan next week.\n\nAdjust it to fit your schedule.";
+  }
+
+  if (text.includes("project")) {
+    return "Let's break your project into four steps: define the goal, choose the features, build a first version, and test it with real users. You can also use the New project button to add it to this dashboard.";
+  }
+
+  return "Thanks for your message! I'm a demo assistant, so I can show sample responses but I am not connected to a real AI model yet. To get real AI answers, connect a backend API and keep your API key on the server.";
+}
+
+function sendChatMessage(text) {
+  const prompt = text.trim();
+  if (!prompt) return;
+
+  addMessage(prompt, "user");
+  $("#chatInput").value = "";
+
+  const chat = $("#chatMessages");
+  const typing = document.createElement("div");
+  typing.className = "message assistant-message";
+
+  const avatar = document.createElement("span");
+  avatar.className = "chat-avatar";
+  avatar.textContent = "✧";
+
+  const bubble = document.createElement("div");
+  bubble.textContent = "Thinking...";
+  typing.append(avatar, bubble);
+  chat.appendChild(typing);
+  chat.scrollTop = chat.scrollHeight;
+
+  setTimeout(() => {
+    typing.remove();
+    addMessage(demoReply(prompt), "assistant");
+  }, 650);
+}
+
+$("#chatForm").addEventListener("submit", event => {
+  event.preventDefault();
+  sendChatMessage($("#chatInput").value);
+});
+
+$("#chatInput").addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    $("#chatForm").requestSubmit();
+  }
+});
+
+// Clickable prompt suggestions and quick actions
+document.addEventListener("click", event => {
+  const promptButton = event.target.closest("[data-prompt]");
+  if (!promptButton) return;
+
+  sendChatMessage(promptButton.dataset.prompt);
+  $("#chatInput").focus();
+});
+
+$("#clearChatBtn").addEventListener("click", () => {
+  $("#chatMessages").replaceChildren();
+
+  const welcome = document.createElement("div");
+  welcome.className = "message assistant-message";
+  const avatar = document.createElement("span");
+  avatar.className = "chat-avatar";
+  avatar.textContent = "✧";
+
+  const bubble = document.createElement("div");
+  const message = document.createElement("p");
+  message.textContent = "Chat cleared! What would you like to work on?";
+  bubble.appendChild(message);
+  welcome.append(avatar, bubble);
+  $("#chatMessages").appendChild(welcome);
+  showToast("Conversation cleared.");
+});
