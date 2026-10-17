@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f6f2">
+  <title>ShopNova | Everyday, Upgraded</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="announcement">
+    Free shipping on orders over ₹1,999
+  </div>
+
+  <header class="header">
+    <a class="logo" href="#">shopnova<span>.</span></a>
+
+    <nav id="nav">
+      <a href="#home">Home</a>
+      <a href="#products">Shop</a>
+      <a href="#about">About</a>
+    </nav>
+
+    <div class="header-actions">
+      <button id="search-focus" aria-label="Search products">⌕</button>
+      <button id="open-cart">Bag (<span id="cart-count">0</span>)</button>
+      <button id="menu-toggle" aria-label="Toggle menu">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-text">
+        <p class="eyebrow">GOOD THINGS, WELL MADE</p>
+        <h1>Everyday,<br><em>upgraded.</em></h1>
+        <p class="hero-description">
+          Thoughtful finds for your space, your pace,
+          and everything in between.
+        </p>
+        <a class="button dark-button" href="#products">
+          Explore collection ↗
+        </a>
+        <p class="customer-note">✳ Loved by 2,400+ happy customers</p>
+      </div>
+
+      <div class="hero-image">
+        <img
+          src="https://images.unsplash.com/photo-1490312278390-ab64016e0aa9?auto=format&fit=crop&w=1200&q=85"
+          alt="Beautiful minimalist home interior"
+        >
+        <div class="image-label">THE EVERYDAY EDIT · 2026</div>
+      </div>
+    </section>
+
+    <section class="benefits">
+      <div>✳ Thoughtfully selected</div>
+      <div>↗ Easy shopping</div>
+      <div>♡ Everyday essentials</div>
+      <div>⌁ Shipping across India</div>
+    </section>
+
+    <section class="products-section" id="products">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">A FEW OF OUR FAVOURITES</p>
+          <h2>Good finds. <em>Great feeling.</em></h2>
+        </div>
+        <p>Useful things, lovely details.<br>All picked with purpose.</p>
+      </div>
+
+      <div class="shop-controls">
+        <div class="categories" id="categories">
+          <button class="category active" data-category="All">Everything</button>
+          <button class="category" data-category="Home">Home</button>
+          <button class="category" data-category="Tech">Tech</button>
+          <button class="category" data-category="Accessories">Accessories</button>
+        </div>
+
+        <div class="tools">
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Search products..."
+            aria-label="Search products"
+          >
+          <select id="sort-select" aria-label="Sort products">
+            <option value="featured">Featured</option>
+            <option value="low">Price: low to high</option>
+            <option value="high">Price: high to low</option>
+            <option value="name">Name: A–Z</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="product-grid" id="product-grid"></div>
+
+      <div class="empty-state" id="empty-state" hidden>
+        <h3>No products found</h3>
+        <p>Try another search or category.</p>
+        <button class="button outline-button" id="clear-filters">
+          Clear filters
+        </button>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <div class="about-image">
+        <img
+          src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1000&q=85"
+          alt="Warm and thoughtfully designed living space"
+          loading="lazy"
+        >
+      </div>
+      <div class="about-text">
+        <p class="eyebrow">A SMALL NOTE FROM US</p>
+        <h2>Buy less.<br><em>Love it more.</em></h2>
+        <p>
+          We believe the things you bring into your life should earn
+          their place there. We look for useful design, considered
+          details, and everyday pieces that simply feel right.
+        </p>
+        <a href="#products" class="text-link">Find your next favourite ↗</a>
+      </div>
+    </section>
+
+    <section class="newsletter">
+      <p class="eyebrow">OCCASIONAL GOOD NEWS</p>
+      <h2>A good thing in<br><em>your inbox.</em></h2>
+      <p>New finds, little perks, no unnecessary noise.</p>
+
+      <form id="newsletter-form">
+        <input
+          id="email-input"
+          type="email"
+          placeholder="Your email address"
+          aria-label="Your email address"
+          required
+        >
+        <button type="submit">Count me in ↗</button>
+      </form>
+      <p id="newsletter-message" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="logo" href="#">shopnova<span>.</span></a>
+    <p>Good things for everyday life.</p>
+    <p>© <span id="year"></span> ShopNova</p>
+  </footer>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="cart-drawer" id="cart-drawer"
+         role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <div class="drawer-header">
+      <div>
+        <p class="eyebrow">YOUR PICKS</p>
+        <h2>Your bag (<span id="drawer-count">0</span>)</h2>
+      </div>
+      <button id="close-cart" class="close-button" aria-label="Close cart">×</button>
+    </div>
+
+    <div class="cart-items" id="cart-items"></div>
+
+    <div class="cart-footer">
+      <div class="subtotal">
+        <span>Subtotal</span>
+        <strong id="cart-subtotal">₹0</strong>
+      </div>
+      <p>Shipping and taxes calculated at checkout.</p>
+      <button class="button dark-button checkout-button" id="checkout-button">
+        Continue to checkout ↗
+      </button>
+      <button class="continue-shopping" id="continue-shopping">
+        Keep looking around
+      </button>
+      <p class="demo-note">
+        Demo store: payment processing is not connected.
+      </p>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
