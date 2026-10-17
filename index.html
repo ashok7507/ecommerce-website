@@ -1,187 +1,184 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f7f6f2">
-  <title>ShopNova | Anyday, Upgraded</title>
+  <meta name="theme-color" content="#080d1a">
+  <title>Nova AI Dashboard</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="announcement">
-    Free shipping on orders over ₹1,999
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <a href="#" class="brand"><span class="brand-icon">✳</span> Nova<span>AI</span></a>
+
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="nav">
+        <a href="#dashboard" class="nav-link active" data-page="Dashboard">▦ <span>Dashboard</span></a>
+        <a href="#analytics" class="nav-link" data-page="Analytics">◷ <span>Analytics</span></a>
+        <a href="#projects" class="nav-link" data-page="Projects">▣ <span>Projects</span></a>
+        <a href="#assistant" class="nav-link" data-page="AI Assistant">✧ <span>AI Assistant</span></a>
+        <a href="#activity" class="nav-link" data-page="Activity">☷ <span>Activity</span></a>
+      </nav>
+
+      <p class="nav-label">PREFERENCES</p>
+      <nav class="nav">
+        <a href="#settings" class="nav-link" data-page="Settings">⚙ <span>Settings</span></a>
+        <a href="#help" class="nav-link" data-page="Help Center">? <span>Help Center</span></a>
+      </nav>
+
+      <div class="upgrade">
+        <div class="upgrade-star">✦</div>
+        <h3>Unlock more AI</h3>
+        <p>Explore advanced tools and supercharge your workflow.</p>
+        <button id="upgradeBtn" class="upgrade-btn">Explore Pro ↗</button>
+      </div>
+
+      <div class="profile">
+        <div class="avatar">R</div>
+        <div><strong>Your Workspace</strong><small>Free plan</small></div>
+        <span class="profile-menu">•••</span>
+      </div>
+    </aside>
+
+    <main class="main" id="dashboard">
+      <header class="topbar">
+        <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Toggle menu">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span> <strong id="pageName">Dashboard</strong></div>
+        <div class="top-actions">
+          <label class="search-box">⌕ <input id="searchInput" type="search" placeholder="Search projects..."></label>
+          <button class="icon-btn" id="themeBtn" title="Toggle theme">☼</button>
+          <button class="icon-btn notification" id="notificationBtn" title="Notifications">♧<i></i></button>
+          <div class="avatar small-avatar">R</div>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="welcome-row">
+          <div>
+            <p class="eyebrow"><span class="live-dot"></span> YOUR AI WORKSPACE</p>
+            <h1>Welcome back! <span class="wave">✦</span></h1>
+            <p class="muted">Your ideas, tools and insights — all in one place.</p>
+          </div>
+          <button class="primary-btn" id="newProjectBtn">＋ New project</button>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-top"><span>AI Requests</span><span class="stat-icon purple">✧</span></div>
+            <h2 id="requestsStat">1,248</h2>
+            <p class="positive">↗ 12.8% <span>vs last week</span></p>
+            <div class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>Active projects</span><span class="stat-icon blue">▦</span></div>
+            <h2 id="projectsStat">24</h2>
+            <p class="positive">↗ 8.2% <span>vs last week</span></p>
+            <div class="mini-bars blue-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>Time saved</span><span class="stat-icon green">◷</span></div>
+            <h2>36.5 <small>hrs</small></h2>
+            <p class="positive">↗ 18.4% <span>vs last week</span></p>
+            <div class="mini-bars green-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top"><span>AI efficiency</span><span class="stat-icon orange">↗</span></div>
+            <h2>94.8<small>%</small></h2>
+            <p class="positive">↗ 4.6% <span>vs last week</span></p>
+            <div class="mini-bars orange-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="panel chart-panel" id="analytics">
+            <div class="panel-heading">
+              <div><h3>AI usage overview</h3><p class="muted">Track your activity over time</p></div>
+              <select id="chartRange" aria-label="Chart time range">
+                <option value="7">Last 7 days</option>
+                <option value="14">Last 14 days</option>
+                <option value="30">Last 30 days</option>
+              </select>
+            </div>
+            <div class="chart-wrap"><canvas id="usageChart"></canvas></div>
+          </section>
+
+          <section class="panel models-panel">
+            <div class="panel-heading"><div><h3>Popular AI tools</h3><p class="muted">By usage share</p></div><span class="pill">This week</span></div>
+            <div class="model-list">
+              <div class="model"><span class="model-logo chatgpt">✳</span><div class="model-info"><div><strong>AI Chat</strong><span>42%</span></div><div class="progress"><i style="width:42%"></i></div></div></div>
+              <div class="model"><span class="model-logo writer">Aa</span><div class="model-info"><div><strong>AI Writer</strong><span>28%</span></div><div class="progress blue-progress"><i style="width:28%"></i></div></div></div>
+              <div class="model"><span class="model-logo image">▧</span><div class="model-info"><div><strong>Image Studio</strong><span>18%</span></div><div class="progress green-progress"><i style="width:18%"></i></div></div></div>
+              <div class="model"><span class="model-logo data">⌁</span><div class="model-info"><div><strong>Data Analyst</strong><span>12%</span></div><div class="progress orange-progress"><i style="width:12%"></i></div></div></div>
+            </div>
+            <button class="text-btn" id="allToolsBtn">Explore all tools →</button>
+          </section>
+
+          <section class="panel projects-panel" id="projects">
+            <div class="panel-heading"><div><h3>Recent projects</h3><p class="muted">Pick up where you left off</p></div><button class="text-btn" id="viewAllBtn">View all →</button></div>
+            <div id="projectList" class="project-list">
+              <article class="project-row" data-search="website chatbot customer support">
+                <span class="project-icon purple">✧</span><div class="project-info"><strong>Smart Chatbot</strong><small>Customer support assistant</small></div><span class="status active-status">Active</span><small class="project-time">2h ago</small><button class="more-btn" aria-label="Project options">•••</button>
+              </article>
+              <article class="project-row" data-search="image generator design">
+                <span class="project-icon green">▧</span><div class="project-info"><strong>Image Generator</strong><small>Creative image concepts</small></div><span class="status active-status">Active</span><small class="project-time">5h ago</small><button class="more-btn" aria-label="Project options">•••</button>
+              </article>
+              <article class="project-row" data-search="content writer blog">
+                <span class="project-icon orange">≡</span><div class="project-info"><strong>Content Writer</strong><small>Blog posts and articles</small></div><span class="status paused-status">Paused</span><small class="project-time">Yesterday</small><button class="more-btn" aria-label="Project options">•••</button>
+              </article>
+              <article class="project-row" data-search="data analyzer reports">
+                <span class="project-icon blue">▥</span><div class="project-info"><strong>Data Analyzer</strong><small>Reports and insights</small></div><span class="status active-status">Active</span><small class="project-time">2d ago</small><button class="more-btn" aria-label="Project options">•••</button>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel actions-panel">
+            <div class="panel-heading"><div><h3>Quick actions</h3><p class="muted">What would you like to create?</p></div></div>
+            <div class="quick-grid">
+              <button class="quick-card" data-prompt="Help me plan a new AI project"><span class="quick-icon purple">✧</span><strong>New project</strong><small>Start from an idea</small></button>
+              <button class="quick-card" data-prompt="Help me write an engaging blog post"><span class="quick-icon blue">✎</span><strong>Write content</strong><small>Ideas into words</small></button>
+              <button class="quick-card" data-prompt="Give me creative ideas for an AI image"><span class="quick-icon green">▧</span><strong>Image ideas</strong><small>Explore creativity</small></button>
+              <button class="quick-card" data-prompt="Help me understand and analyze my data"><span class="quick-icon orange">▥</span><strong>Analyze data</strong><small>Find useful insights</small></button>
+            </div>
+          </section>
+        </div>
+
+        <footer>Made for your next big idea <span>✦</span> <span class="footer-right">Nova AI Dashboard · Demo</span></footer>
+      </section>
+    </main>
+
+    <aside class="assistant-panel" id="assistant">
+      <div class="assistant-heading"><div><span class="assistant-symbol">✧</span><div><h3>AI Assistant</h3><p><span class="live-dot"></span> Ready to help</p></div></div><button class="icon-btn" id="clearChatBtn" title="Clear chat">↻</button></div>
+      <div class="chat-messages" id="chatMessages" aria-live="polite">
+        <div class="message assistant-message"><span class="chat-avatar">✧</span><div><p>Hey there! 👋</p><p>I'm your AI assistant. What would you like to work on today?</p></div></div>
+        <p class="suggestion-label">TRY ASKING</p>
+        <button class="suggestion" data-prompt="Give me 5 creative startup ideas">✦ Give me startup ideas</button>
+        <button class="suggestion" data-prompt="Write a short product description for an AI app">✎ Write product content</button>
+        <button class="suggestion" data-prompt="Give me a simple weekly productivity plan">◷ Plan my week</button>
+      </div>
+      <form class="chat-form" id="chatForm">
+        <textarea id="chatInput" rows="2" placeholder="Ask me anything..." aria-label="Your message"></textarea>
+        <div class="chat-form-bottom"><span>Enter to send · Shift+Enter for new line</span><button type="submit" class="send-btn" aria-label="Send message">↑</button></div>
+      </form>
+      <p class="ai-note">✦ AI responses are demo-generated</p>
+    </aside>
   </div>
 
-  <header class="header">
-    <a class="logo" href="#">shopnova<span>.</span></a>
-
-    <nav id="nav">
-      <a href="#home">Home</a>
-      <a href="#products">Shop</a>
-      <a href="#about">About</a>
-    </nav>
-
-    <div class="header-actions">
-      <button id="search-focus" aria-label="Search products">⌕</button>
-      <button id="open-cart">Bag (<span id="cart-count">0</span>)</button>
-      <button id="menu-toggle" aria-label="Toggle menu">☰</button>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero" id="home">
-      <div class="hero-text">
-        <p class="eyebrow">GOOD THINGS, WELL MADE</p>
-        <h1>Everyday,<br><em>upgraded.</em></h1>
-        <p class="hero-description">
-          Thoughtful finds for your space, your pace,
-          and everything in between.
-        </p>
-        <a class="button dark-button" href="#products">
-          Explore collection ↗
-        </a>
-        <p class="customer-note">✳ Loved by 2,400+ happy customers</p>
-      </div>
-
-      <div class="hero-image">
-        <img
-          src="https://images.unsplash.com/photo-1490312278390-ab64016e0aa9?auto=format&fit=crop&w=1200&q=85"
-          alt="Beautiful minimalist home interior"
-        >
-        <div class="image-label">THE EVERYDAY EDIT · 2026</div>
-      </div>
-    </section>
-
-    <section class="benefits">
-      <div>✳ Thoughtfully selected</div>
-      <div>↗ Easy shopping</div>
-      <div>♡ Everyday essentials</div>
-      <div>⌁ Shipping across India</div>
-    </section>
-
-    <section class="products-section" id="products">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">A FEW OF OUR FAVOURITES</p>
-          <h2>Good finds. <em>Great feeling.</em></h2>
-        </div>
-        <p>Useful things, lovely details.<br>All picked with purpose.</p>
-      </div>
-
-      <div class="shop-controls">
-        <div class="categories" id="categories">
-          <button class="category active" data-category="All">Everything</button>
-          <button class="category" data-category="Home">Home</button>
-          <button class="category" data-category="Tech">Tech</button>
-          <button class="category" data-category="Accessories">Accessories</button>
-        </div>
-
-        <div class="tools">
-          <input
-            type="search"
-            id="search-input"
-            placeholder="Search products..."
-            aria-label="Search products"
-          >
-          <select id="sort-select" aria-label="Sort products">
-            <option value="featured">Featured</option>
-            <option value="low">Price: low to high</option>
-            <option value="high">Price: high to low</option>
-            <option value="name">Name: A–Z</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="product-grid" id="product-grid"></div>
-
-      <div class="empty-state" id="empty-state" hidden>
-        <h3>No products found</h3>
-        <p>Try another search or category.</p>
-        <button class="button outline-button" id="clear-filters">
-          Clear filters
-        </button>
-      </div>
-    </section>
-
-    <section class="about" id="about">
-      <div class="about-image">
-        <img
-          src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1000&q=85"
-          alt="Warm and thoughtfully designed living space"
-          loading="lazy"
-        >
-      </div>
-      <div class="about-text">
-        <p class="eyebrow">A SMALL NOTE FROM US</p>
-        <h2>Buy less.<br><em>Love it more.</em></h2>
-        <p>
-          We believe the things you bring into your life should earn
-          their place there. We look for useful design, considered
-          details, and everyday pieces that simply feel right.
-        </p>
-        <a href="#products" class="text-link">Find your next favourite ↗</a>
-      </div>
-    </section>
-
-    <section class="newsletter">
-      <p class="eyebrow">OCCASIONAL GOOD NEWS</p>
-      <h2>A good thing in<br><em>your inbox.</em></h2>
-      <p>New finds, little perks, no unnecessary noise.</p>
-
-      <form id="newsletter-form">
-        <input
-          id="email-input"
-          type="email"
-          placeholder="Your email address"
-          aria-label="Your email address"
-          required
-        >
-        <button type="submit">Count me in ↗</button>
-      </form>
-      <p id="newsletter-message" aria-live="polite"></p>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <a class="logo" href="#">shopnova<span>.</span></a>
-    <p>Good things for everyday life.</p>
-    <p>© <span id="year"></span> ShopNova</p>
-  </footer>
-
-  <div class="overlay" id="overlay"></div>
-
-  <aside class="cart-drawer" id="cart-drawer"
-         role="dialog" aria-modal="true" aria-label="Shopping cart">
-    <div class="drawer-header">
-      <div>
-        <p class="eyebrow">YOUR PICKS</p>
-        <h2>Your bag (<span id="drawer-count">0</span>)</h2>
-      </div>
-      <button id="close-cart" class="close-button" aria-label="Close cart">×</button>
-    </div>
-
-    <div class="cart-items" id="cart-items"></div>
-
-    <div class="cart-footer">
-      <div class="subtotal">
-        <span>Subtotal</span>
-        <strong id="cart-subtotal">₹0</strong>
-      </div>
-      <p>Shipping and taxes calculated at checkout.</p>
-      <button class="button dark-button checkout-button" id="checkout-button">
-        Continue to checkout ↗
-      </button>
-      <button class="continue-shopping" id="continue-shopping">
-        Keep looking around
-      </button>
-      <p class="demo-note">
-        Demo store: payment processing is not connected.
-      </p>
-    </div>
-  </aside>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script src="script.js"></script>
+  <div class="toast" id="toast" role="status"></div>
+  <dialog id="projectDialog">
+    <form method="dialog" id="projectForm">
+      <div class="dialog-heading"><h3>Create a project</h3><button class="icon-btn" value="cancel" aria-label="Close">×</button></div>
+      <label for="projectName">Project name</label>
+      <input id="projectName" maxlength="60" placeholder="e.g. Marketing assistant" required>
+      <label for="projectDescription">Short description</label>
+      <input id="projectDescription" maxlength="100" placeholder="What are you building?">
+      <div class="dialog-actions"><button class="secondary-btn" value="cancel">Cancel</button><button class="primary-btn" id="createProjectBtn" value="default">Create project</button></div>
+    </form>
+  </dialog>
 </body>
 </html>
